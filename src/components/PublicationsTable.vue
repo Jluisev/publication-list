@@ -1,27 +1,45 @@
 <template>
   <div class="publications-table">
     <div class="row controls-row">
-      <div class="col-md-6">
+      <div class="col-md-12 filters-row">
         <b-form-input v-model="searchString"
+                      class="search-input"
                       size="sm"
                       type="text"
                       placeholder="Search" />
-      </div>
-      <div class="col-md-6 select-fields">
-        <b-form-select v-model="selectedState" size="sm" :options="states"/>
-        <b-form-select v-model="selectedGrade" size="sm" :options="grades"/>
-        <b-form-select v-model="selectedStatus" size="sm" :options="statuses"/>
+        <b-form-select v-model="selectedState" size="sm" :options="states">
+          <option :value="null">All States</option>
+        </b-form-select>
+        <b-form-select v-model="selectedGrade" size="sm" :options="grades">
+          <option :value="null">All Grades</option>
+        </b-form-select>
+        <b-form-select v-model="selectedStatus" size="sm" :options="statuses">
+          <option :value="null">All Statuses</option>
+        </b-form-select>
       </div>
     </div>
     <div class="row">
       <div class="col-md-12 pt-3">
-        <b-table striped hover :items="items" :fields="fields"></b-table>
+        <b-table :filter="searchString" show-empty hover head-variant="light" :items="items" :fields="fields">
+          <template slot="publication_title" slot-scope="data">
+            <a :href="'#'" v-b-modal.modal-1 v-on:click="$emit('open-modal')">
+              {{data.value}}
+            </a>
+          </template>
+          <template slot="actions" slot-scope="data">
+            <b-dropdown id="actions" variant="outline-secondary" text="Actions" size="sm">
+              <b-dropdown-item-button v-b-modal.modal-1>Edit</b-dropdown-item-button>
+              <b-dropdown-item-button @click="deletePost">Delete</b-dropdown-item-button>
+            </b-dropdown>
+          </template>
+        </b-table>
       </div>
     </div>
   </div>
 </template>
 
 <script>
+import { states, grades, statuses, publications } from '../constants'
 export default {
   name: 'PublicationsTable',
   data () {
@@ -30,15 +48,9 @@ export default {
       selectedState: null,
       selectedGrade: null,
       selectedStatus: null,
-      states: [
-        { value: 'Al', text: 'Alabama' }
-      ],
-      grades: [
-        { value: '1', text: 'A' }
-      ],
-      statuses: [
-        { value: 'outlined', text: 'Outlined' }
-      ],
+      states,
+      grades,
+      statuses,
       fields: [
         {
           key: 'publication_title'
@@ -60,14 +72,28 @@ export default {
           key: 'actions'
         }
       ],
-      items: [{
-        publication_title: '3',
-        'state_&_grade': 'fd',
-        sku: 'f',
-        year: '444',
-        status: 'v',
-        actions: 'vv'
-      }]
+      items: publications
+    }
+  },
+  methods: {
+    deletePost () {
+      this.$swal({
+        text: 'Would you like to delete this publication?',
+        type: 'warning',
+        showCancelButton: true,
+        cancelButtonColor: '#3085d6',
+        confirmButtonColor: '#d33',
+        confirmButtonText: 'Delete Publication',
+        cancelButtonText: 'Keep Publication'
+      }).then((result) => {
+        if (result.value) {
+          this.$swal(
+            'Deleted!',
+            'The publication has been deleted.',
+            'success'
+          )
+        }
+      })
     }
   }
 }
@@ -78,7 +104,15 @@ export default {
   .publications-table {
     padding: 0 15px;
   }
-  .select-fields select {
-    width: 30%;
+  .filters-row {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+  }
+  .filters-row .search-input {
+    width: 50%;
+  }
+  .filters-row select {
+    width: 15%;
   }
 </style>

@@ -2,26 +2,26 @@
   <div class="publication-list">
     <Header />
     <div class="col-md-12">
-      <button class="btn btn-sm btn-primary float-right">Create Publication</button>
+      <b-button size="sm" variant="primary" class="float-right" v-b-modal.modal-1>Create Publication</b-button>
     </div>
     <PublicationsTable />
+    <b-modal hide-footer id="modal-1" size="lg" title="Create Publication">
+      <PublicationForm />
+    </b-modal>
   </div>
 </template>
 
 <script>
 import Header from './Header.vue'
 import PublicationsTable from './PublicationsTable.vue'
+import PublicationForm from './PublicationForm.vue'
 export default {
   components: {
     Header,
-    PublicationsTable
+    PublicationsTable,
+    PublicationForm
   },
-  name: 'PublicationList',
-  data () {
-    return {
-      msg: 'Publication List'
-    }
-  }
+  name: 'PublicationList'
 }
 </script>
 
